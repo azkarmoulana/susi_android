@@ -14,21 +14,21 @@ import retrofit2.Response
  *
  * Created by chiragw15 on 15/8/17.
  */
-class SkillListingPresenter: ISkillListingPresenter,
-        ISkillListingModel.onFetchGroupsFinishedListener, ISkillListingModel.onFetchSkillsFinishedListener {
+class SkillListingPresenter : ISkillListingPresenter,
+        ISkillListingModel.OnFetchGroupsFinishedListener, ISkillListingModel.OnFetchSkillsFinishedListener {
 
-    var skillListingModel: ISkillListingModel = SkillListingModel()
-    var skillListingView: ISkillListingView ?= null
-    var count = 0
-    var skills: ArrayList<Pair<String, Map<String, SkillData>>> = ArrayList()
-    var groupsCount = 0
-    var groups:  List<String> = ArrayList()
+    private var skillListingModel: ISkillListingModel = SkillListingModel()
+    private var skillListingView: ISkillListingView? = null
+    private var count = 1
+    var skills: ArrayList<Pair<String, List<SkillData>>> = ArrayList()
+    private var groupsCount = 0
+    private var groups: List<String> = ArrayList()
 
     override fun onAttach(skillListingView: ISkillListingView) {
         this.skillListingView = skillListingView
     }
 
-    override fun getGroups() {
+    override fun getGroups(swipeToRefreshActive: Boolean) {
         skillListingView?.visibilityProgressBar(true)
         skillListingModel.fetchGroups(this)
     }
@@ -52,12 +52,12 @@ class SkillListingPresenter: ISkillListingPresenter,
     override fun onSkillFetchSuccess(response: Response<ListSkillsResponse>, group: String) {
         skillListingView?.visibilityProgressBar(false)
         if (response.isSuccessful && response.body() != null) {
-            val responseSkillMap = response.body().skillMap
-            if(responseSkillMap.isNotEmpty()) {
+            val responseSkillMap = response.body().filteredSkillsData
+            if (responseSkillMap.isNotEmpty()) {
                 skills.add(Pair(group, responseSkillMap))
                 skillListingView?.updateAdapter(skills)
             }
-            if(count != groupsCount) {
+            if (count != groupsCount) {
                 skillListingModel.fetchSkills(groups[count], this)
                 count++
             }

@@ -1,8 +1,10 @@
 package org.fossasia.susi.ai.chat.adapters.recycleradapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -14,12 +16,11 @@ import java.util.List;
 
 /**
  * <h1>Adapter to display horizontal list of RSS results.</h1>
- *
+ * <p>
  * Created by saurabh on 19/11/16.
  */
 
 public class SearchResultsAdapter extends RecyclerView.Adapter<RssViewHolder> {
-    public static final String TAG = SearchResultsAdapter.class.getSimpleName();
     private LayoutInflater inflater;
     private List<Datum> datumList;
 
@@ -34,22 +35,25 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<RssViewHolder> {
         inflater = LayoutInflater.from(context);
     }
 
+    @NonNull
     @Override
-    public RssViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RssViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new RssViewHolder(inflater.inflate(R.layout.rss_item, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(final RssViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final RssViewHolder holder, int position) {
         Datum datum = datumList.get(position);
         if (datum != null) {
-            if( datum.getTitle() != null && !datum.getTitle().isEmpty()) {
-                holder.titleTextView.setText(Html.fromHtml(datum.getTitle()));
+            if (!TextUtils.isEmpty(datum.getLink())) {
+                if (!TextUtils.isEmpty(datum.getTitle())) {
+                    holder.titleTextView.setText(Html.fromHtml(datum.getTitle()));
+                }
+                if (!TextUtils.isEmpty(datum.getDescription())) {
+                    holder.descriptionTextView.setText(Html.fromHtml(datum.getDescription()));
+                }
+                holder.linkTextView.setText(datum.getLink());
             }
-            if(datum.getDescription() != null && !datum.getDescription().isEmpty()) {
-                holder.descriptionTextView.setText(Html.fromHtml(datum.getDescription()));
-            }
-            holder.linkTextView.setText(datum.getLink());
         }
     }
 

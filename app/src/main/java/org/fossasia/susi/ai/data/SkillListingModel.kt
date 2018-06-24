@@ -4,23 +4,23 @@ import org.fossasia.susi.ai.data.contract.ISkillListingModel
 import org.fossasia.susi.ai.rest.ClientBuilder
 import org.fossasia.susi.ai.rest.responses.susi.ListGroupsResponse
 import org.fossasia.susi.ai.rest.responses.susi.ListSkillsResponse
-import org.fossasia.susi.ai.rest.responses.susi.LoginResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 
 /**
  *
  * Created by chiragw15 on 16/8/17.
  */
-class SkillListingModel: ISkillListingModel {
+class SkillListingModel : ISkillListingModel {
 
-    lateinit var authResponseCallGroups: Call<ListGroupsResponse>
-    lateinit var authResponseCallSkills: Call<ListSkillsResponse>
+    private lateinit var authResponseCallGroups: Call<ListGroupsResponse>
+    private lateinit var authResponseCallSkills: Call<ListSkillsResponse>
 
-    var clientBuilder: ClientBuilder = ClientBuilder()
+    private var clientBuilder: ClientBuilder = ClientBuilder()
 
-    override fun fetchGroups(listener: ISkillListingModel.onFetchGroupsFinishedListener) {
+    override fun fetchGroups(listener: ISkillListingModel.OnFetchGroupsFinishedListener) {
 
         authResponseCallGroups = clientBuilder.susiApi.fetchListGroups()
 
@@ -36,9 +36,9 @@ class SkillListingModel: ISkillListingModel {
         })
     }
 
-    override fun fetchSkills(group: String, listener: ISkillListingModel.onFetchSkillsFinishedListener) {
+    override fun fetchSkills(group: String, listener: ISkillListingModel.OnFetchSkillsFinishedListener) {
 
-        authResponseCallSkills = clientBuilder.susiApi.fetchListSkills(group)
+        authResponseCallSkills = clientBuilder.susiApi.fetchListSkills(group, "true", "descending", "rating")
 
         authResponseCallSkills.enqueue(object : Callback<ListSkillsResponse> {
             override fun onResponse(call: Call<ListSkillsResponse>, response: Response<ListSkillsResponse>) {
@@ -57,7 +57,7 @@ class SkillListingModel: ISkillListingModel {
             authResponseCallGroups.cancel()
             authResponseCallSkills.cancel()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Timber.e(e)
         }
     }
 }
